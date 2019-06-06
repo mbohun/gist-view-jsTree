@@ -1,5 +1,5 @@
 # gist-view-jsTree
-[https://mbohun.github.io/gist-view-jsTree/](https://mbohun.github.io/gist-view-jsTree/)
+## [https://mbohun.github.io/gist-view-jsTree/](https://mbohun.github.io/gist-view-jsTree/)
 
 #### dev notes
 ```BASH
