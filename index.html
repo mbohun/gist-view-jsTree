@@ -16,8 +16,20 @@
               return response.json();
           })
           .then(function(myJson) {
+              console.log("INPUT:" + JSON.stringify(myJson));
+
               var input_data = [];
               myJson.forEach(function(gist) {
+                  var gist_file_names = Object.keys(gist.files);
+                  var gist_files = [];
+                  gist_file_names.forEach(function(file_name) {
+                      //console.log("TEST:" + gist.files[file_name].raw_url);
+                      gist_files.push({
+                          'text': gist.files[file_name].filename,
+                          'icon' : 'jstree-file'
+                      });
+                  });
+
                   input_data.push({
                       'text': gist.description,
                       'id':   gist.id,
@@ -26,7 +38,7 @@
                         'disabled': false,
                         'selected': false
                       },
-                      'children' : Object.keys(gist.files)
+                      'children' : gist_files
                   });
               });
 
