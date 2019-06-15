@@ -26,13 +26,16 @@
                       //console.log("TEST:" + gist.files[file_name].raw_url);
                       gist_files.push({
                           'text': gist.files[file_name].filename,
-                          'icon' : 'jstree-file'
+                          'icon' : 'jstree-file',
+                          'raw_url': gist.files[file_name].raw_url,
+                          'type': gist.files[file_name].type
                       });
                   });
 
                   input_data.push({
                       'text': gist.description,
                       'id':   gist.id,
+                      'html_url': gist.html_url,
                       'state': {
                         'opened':   false,
                         'disabled': false,
