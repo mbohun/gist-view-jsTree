@@ -4,22 +4,43 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="dist/jstree.min.js"></script>
   </head>
-  
+
   <body>
     <div id="container">
     </div>
 
   <script>
-    $(function() {
-    	$('#container').jstree({
-    		'core' : {
-    			'data' : {
-    				"url" : "./my_gists_jsTree.json",
-            			"dataType" : "json" // needed only if you do not supply JSONheaders
-    			}
-    		}
-    	});
-    });
+  $(function() {
+      fetch('https://api.github.com/users/mbohun/gists')
+          .then(function(response) {
+              return response.json();
+          })
+          .then(function(myJson) {
+              var input_data = [];
+              myJson.forEach(function(gist) {
+                  input_data.push({
+                      'text': gist.description,
+                      'id':   gist.id,
+                      'state': {
+                        'opened':   false,
+                        'disabled': false,
+                        'selected': false
+                      },
+                      'children' : Object.keys(gist.files)
+                  });
+              });
+
+              console.log(input_data);
+
+              console.log("BEFORE jstree");
+
+              $('#container').jstree({
+                  'core' : {
+                      'data': input_data
+                  }
+              });
+          });
+    })
   </script>
   </body>
 </html>
