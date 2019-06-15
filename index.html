@@ -6,55 +6,69 @@
   </head>
 
   <body>
+    <div>
+        <label for="input_github_username">GitHub username:</label>
+        <input type="text" id="input_github_username" name="username" required minlength="2" maxlength="64" size="16">
+        <input type="button" id="button_show_gists" value="show gists">
+    </div>
     <div id="container">
     </div>
 
   <script>
   $(function() {
-      fetch('https://api.github.com/users/mbohun/gists')
-          .then(function(response) {
-              return response.json();
-          })
-          .then(function(myJson) {
-              console.log("INPUT:" + JSON.stringify(myJson));
+      var load_gists = function() {
+          const githubUsername = $('#input_github_username').val();
+          console.log("GitHub username:" + githubUsername);
 
-              var input_data = [];
-              myJson.forEach(function(gist) {
-                  var gist_file_names = Object.keys(gist.files);
-                  var gist_files = [];
-                  gist_file_names.forEach(function(file_name) {
-                      //console.log("TEST:" + gist.files[file_name].raw_url);
-                      gist_files.push({
-                          'text': gist.files[file_name].filename,
-                          'icon' : 'jstree-file',
-                          'raw_url': gist.files[file_name].raw_url,
-                          'type': gist.files[file_name].type
+          fetch("https://api.github.com/users/" + githubUsername + "/gists")
+              .then(function(response) {
+                  return response.json();
+              })
+              .then(function(myJson) {
+                  console.log("INPUT:" + JSON.stringify(myJson));
+
+                  var input_data = [];
+                  myJson.forEach(function(gist) {
+                      var gist_file_names = Object.keys(gist.files);
+                      var gist_files = [];
+                      gist_file_names.forEach(function(file_name) {
+                          //console.log("TEST:" + gist.files[file_name].raw_url);
+                          gist_files.push({
+                              'text': gist.files[file_name].filename,
+                              'icon' : 'jstree-file',
+                              'raw_url': gist.files[file_name].raw_url,
+                              'type': gist.files[file_name].type
+                          });
+                      });
+
+                      input_data.push({
+                          'text': gist.description,
+                          'id':   gist.id,
+                          'html_url': gist.html_url,
+                          'state': {
+                            'opened':   false,
+                            'disabled': false,
+                            'selected': false
+                          },
+                          'children' : gist_files
                       });
                   });
 
-                  input_data.push({
-                      'text': gist.description,
-                      'id':   gist.id,
-                      'html_url': gist.html_url,
-                      'state': {
-                        'opened':   false,
-                        'disabled': false,
-                        'selected': false
-                      },
-                      'children' : gist_files
+                  console.log(input_data);
+
+                  console.log("BEFORE jstree");
+
+                  $('#container').jstree("destroy");
+                  $('#container').jstree({
+                      'core' : {
+                          'data': input_data
+                      }
                   });
               });
+      };
 
-              console.log(input_data);
+      $('#button_show_gists').on('click', load_gists);
 
-              console.log("BEFORE jstree");
-
-              $('#container').jstree({
-                  'core' : {
-                      'data': input_data
-                  }
-              });
-          });
     })
   </script>
   </body>
