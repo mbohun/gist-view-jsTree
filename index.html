@@ -22,6 +22,9 @@
 
           fetch("https://api.github.com/users/" + githubUsername + "/gists")
               .then(function(response) {
+                  for (var pair of response.headers.entries()) {
+                      console.log('HEADER: ' + pair[0] + ': ' + pair[1]);
+                  }
                   return response.json();
               })
               .then(function(myJson) {
