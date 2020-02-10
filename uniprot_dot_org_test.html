@@ -1,0 +1,34 @@
+<html>
+    <head>
+    </head>
+    <body>
+        <script>
+            window.onload = function() {
+                // NOTE:  https://www.uniprot.org/taxonomy/131567 is the top node
+                //
+                const UNIPROT_DOT_ORG_TOP_NODE_ID = 131567;
+                const UNIPROT_DOT_ORG_TOP_NODE_URL = 'https://www.uniprot.org/taxonomy/' + UNIPROT_DOT_ORG_TOP_NODE_ID + '.rdf';
+                console.log('UNIPROT_DOT_ORG_TOP_NODE_URL:', UNIPROT_DOT_ORG_TOP_NODE_URL);
+
+                fetch(UNIPROT_DOT_ORG_TOP_NODE_URL)
+                .then(function(response) {
+                    console.log('response:', response);
+                    return response.text();
+                })
+                .then(function(text) {
+                    console.log("text:", text);
+                    // TODO: do we have to *REALLY* new DOMParser() per call ?
+                    return new DOMParser().parseFromString(text, "text/xml");
+                })
+                .then(function(xml) {
+                    console.log("xml:", xml);
+
+                    // NOTE: attach the xml doc to the window so it can be used from the Developer Tools, etc.
+                    window.uniprot = {
+                        'xml': xml
+                    };
+                });
+            };
+        </script>
+    </body>
+</html>
