@@ -13,7 +13,11 @@
                 <label for="input_github_token">GitHub token:</label>
                 <input type="password" id="input_github_token" name="token" autocomplete minlength="16" maxlength="64" size="16">
                 <input type="button" id="button_show_gists" value="show gists">
+                <label for="load_prog">Loading progress:</label>
+                <progress id="load_prog" max="100" value="0"></progress>
             </form>
+        </div>
+        <div id="root-avatar">
         </div>
         <div id="container">
         </div>
@@ -23,6 +27,8 @@
 
             $(function() {
                 var load_gists = async function() {
+                    $('#container').jstree("destroy");
+
                     const githubUsername = $('#input_github_username').val();
                     console.log("GitHub username:" + githubUsername);
 
@@ -30,6 +36,17 @@
                     console.log("GitHub token:", (0 < githubToken.length) ? "provided" : "not provided");
 
                     const octokit = new Octokit({ auth: githubToken });
+
+                    // NOTE: Load user info first
+                    const response = await octokit.request("GET /users/" + githubUsername);
+                    console.log("DEBUG user info:", response.data);
+
+                    var img = document.createElement("img");
+                    img.src = response.data.avatar_url;
+                    img.alt = response.data.login;
+                    img.style = "height: 32px;";
+                    $('#root-avatar').empty();
+                    document.getElementById("root-avatar").appendChild(img);
 
                     var gists = [],
                         page = 1;
@@ -78,7 +95,6 @@
 
                     console.log("DEBUG input_data:", input_data);
 
-                    $('#container').jstree("destroy");
                     $('#container').jstree({
                         'core' : {
                             'data': input_data
