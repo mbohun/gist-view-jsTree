@@ -1,93 +1,93 @@
 <html>
     <head>
-	<link rel="stylesheet" href="dist/themes/default/style.min.css" />
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="dist/jstree.min.js"></script>
+        <link rel="stylesheet" href="dist/themes/default/style.min.css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="dist/jstree.min.js"></script>
     </head>
 
     <body>
-	<div>
-	    <form>
-		<label for="input_github_username">GitHub username:</label>
-		<input type="text" id="input_github_username" name="username" required minlength="2" maxlength="64" size="16">
-		<label for="input_github_token">GitHub token:</label>
-		<input type="password" id="input_github_token" name="token" autocomplete minlength="16" maxlength="64" size="16">
-		<input type="button" id="button_show_gists" value="show gists">
-	    </form>
-	</div>
-	<div id="container">
-	</div>
+        <div>
+            <form>
+                <label for="input_github_username">GitHub username:</label>
+                <input type="text" id="input_github_username" name="username" required minlength="2" maxlength="64" size="16">
+                <label for="input_github_token">GitHub token:</label>
+                <input type="password" id="input_github_token" name="token" autocomplete minlength="16" maxlength="64" size="16">
+                <input type="button" id="button_show_gists" value="show gists">
+            </form>
+        </div>
+        <div id="container">
+        </div>
 
-	<script type="module">
-	    import { Octokit } from "https://cdn.skypack.dev/@octokit/core";
+        <script type="module">
+            import { Octokit } from "https://cdn.skypack.dev/@octokit/core";
 
-	    $(function() {
-		var load_gists = async function() {
-		    const githubUsername = $('#input_github_username').val();
-		    console.log("GitHub username:" + githubUsername);
+            $(function() {
+                var load_gists = async function() {
+                    const githubUsername = $('#input_github_username').val();
+                    console.log("GitHub username:" + githubUsername);
 
-		    const githubToken = $('#input_github_token').val();
-		    console.log("GitHub token:", (0 < githubToken.length) ? "provided" : "not provided");
+                    const githubToken = $('#input_github_token').val();
+                    console.log("GitHub token:", (0 < githubToken.length) ? "provided" : "not provided");
 
-		    const octokit = new Octokit({ auth: githubToken });
+                    const octokit = new Octokit({ auth: githubToken });
 
-		    var gists = [],
-			page = 1;
+                    var gists = [],
+                        page = 1;
 
-		    while (true) {
-			const response = await octokit.request("GET /users/" + githubUsername + "/gists?page=" + page++ );
+                    while (true) {
+                        const response = await octokit.request("GET /users/" + githubUsername + "/gists?page=" + page++ );
 
-			//TODO: properly verify the response
-			if (response.data.length === 0) {
-			    // there is no more data to load
-			    break;
-			}
+                        //TODO: properly verify the response
+                        if (response.data.length === 0) {
+                            // there is no more data to load
+                            break;
+                        }
 
-			response.data.forEach(element => gists.push(element));
-		    }
+                        response.data.forEach(element => gists.push(element));
+                    }
 
-		    console.log("DEBUG gists:", gists);
+                    console.log("DEBUG gists:", gists);
 
-		    // copy/convert the loaded gists into jstree input format
-		    var input_data = [];
-		    gists.forEach(function(gist) {
-			var gist_file_names = Object.keys(gist.files);
-			var gist_files = [];
-			gist_file_names.forEach(function(file_name) {
-			    //console.log("TEST:" + gist.files[file_name].raw_url);
-			    gist_files.push({
-				'text': gist.files[file_name].filename,
-				'icon' : 'jstree-file',
-				'raw_url': gist.files[file_name].raw_url,
-				'type': gist.files[file_name].type
-			    });
-			});
+                    // copy/convert the loaded gists into jstree input format
+                    var input_data = [];
+                    gists.forEach(function(gist) {
+                        var gist_file_names = Object.keys(gist.files);
+                        var gist_files = [];
+                        gist_file_names.forEach(function(file_name) {
+                            //console.log("TEST:" + gist.files[file_name].raw_url);
+                            gist_files.push({
+                                'text': gist.files[file_name].filename,
+                                'icon' : 'jstree-file',
+                                'raw_url': gist.files[file_name].raw_url,
+                                'type': gist.files[file_name].type
+                            });
+                        });
 
-			input_data.push({
-			    'text': gist.description,
-			    'id':   gist.id,
-			    'html_url': gist.html_url,
-			    'state': {
-				'opened':   false,
-				'disabled': false,
-				'selected': false
-			    },
-			    'children' : gist_files
-			});
-		    });
+                        input_data.push({
+                            'text': gist.description,
+                            'id':   gist.id,
+                            'html_url': gist.html_url,
+                            'state': {
+                                'opened':   false,
+                                'disabled': false,
+                                'selected': false
+                            },
+                            'children' : gist_files
+                        });
+                    });
 
-		    console.log("DEBUG input_data:", input_data);
+                    console.log("DEBUG input_data:", input_data);
 
-		    $('#container').jstree("destroy");
-		    $('#container').jstree({
-			'core' : {
-			    'data': input_data
-			}
-		    });
-		};
+                    $('#container').jstree("destroy");
+                    $('#container').jstree({
+                        'core' : {
+                            'data': input_data
+                        }
+                    });
+                };
 
-		$('#button_show_gists').on('click', load_gists);
-	    })
-	</script>
+                $('#button_show_gists').on('click', load_gists);
+            })
+        </script>
     </body>
 </html>
